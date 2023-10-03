@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "49005:80"
+    volumes:
+      - .:/var/www/sdt-test
+      - ./docker/nginx/hosts:/etc/nginx/conf.d
+      - ./docker/nginx/logs:/var/log/nginx
+    restart: always
+    links:
+      - php
+
+  php:
+    build: ./docker/php
+    volumes:
+      - .:/var/www/sdt-test
+    restart: always
+    links:
+      - mysql
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - "49006:3306"
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - '49007:5432'
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+    restart: always
